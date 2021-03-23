@@ -41,7 +41,7 @@ const Register = () => {
           toast.error(err.response.data.error);
         });
       }else{
-        toast.error("Password don\'t matches");
+        toast.error("Password don't matches");
       }
     }else{
       toast.error("Please fill all fields");
