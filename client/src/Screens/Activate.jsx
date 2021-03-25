@@ -3,8 +3,8 @@ import authSvg from "../assets/welcome.svg";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { authenticate, isAuth } from "../helpers/auth";
-import { Link, Redirect } from "react-router-dom";
+import { isAuth } from "../helpers/auth";
+import { Redirect } from "react-router-dom";
 
 const Activate = ({ match }) => {
 
@@ -21,9 +21,9 @@ const Activate = ({ match }) => {
     if(token){
       setFormData({...formData, name, token})
     }
-  },[])
+  }, [match.params.token, formData])
 
-  const { name, show, token } = formData;
+  const { token } = formData;
 
   const handleSubmit = e => {
     e.preventDefault();
