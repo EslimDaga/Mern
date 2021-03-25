@@ -15,10 +15,11 @@ const Reset = ({ match }) => {
 
   useEffect(() => {
     let token = match.params.token;
+
     if(token){
       setFormData({ ...formData, token });
     }
-  }, []);
+  }, [match.params.token, formData]);
 
   const handleChange = text => e => {
     setFormData({ ...formData, [text] : e.target.value })
