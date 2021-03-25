@@ -5,7 +5,7 @@ import authSvg from "../assets/auth.svg";
 import { ToastContainer, toast } from "react-toastify";
 import { authenticate, isAuth } from "../helpers/auth";
 
-const Login = () => {
+const Login = ({ history }) => {
   const [formData, setFormData] = useState({
     email: "",
     password1: "",
@@ -19,25 +19,43 @@ const Login = () => {
 
   //Submit data to backend
   const handleSubmit = e => {
+    console.log(process.env.REACT_APP_API_URL);
     e.preventDefault();
     if (email && password1) {
-        axios.post(`${process.env.REACT_APP_API_URL}/login`, {
+      setFormData({ ...formData, textChange: 'Submitting' });
+      axios
+        .post(`${process.env.REACT_APP_API_URL}/login`, {
           email,
           password: password1
-        }).then(res => {
+        })
+        .then(res => {
+          authenticate(res, () => {
+            setFormData({
+              ...formData,
+              email: '',
+              password1: '',
+              textChange: 'Submitted'
+            });
+            isAuth() && isAuth().role === 'admin'
+              ? history.push('/admin')
+              : history.push('/private');
+            toast.success(`Hey ${res.data.user.name}, Welcome back!`);
+          });
+        })
+        .catch(err => {
           setFormData({
             ...formData,
-            email: "",
-            password1: ""
-          })
-          toast.success("Sign in Success");
-        }).catch(err => {
-          toast.error(err.response.data.error);
+            email: '',
+            password1: '',
+            textChange: 'Sign In'
+          });
+          console.log(err.response);
+          toast.error(err.response.data.errors);
         });
     } else {
-      toast.error("Please fill all fields");
+      toast.error('Please fill all fields');
     }
-  }
+  };
 
   return (
     <div className='min-h-screen bg-gray-100 text-gray-900 flex justify-center'>
@@ -75,6 +93,12 @@ const Login = () => {
                   <i className='fas fa-user-plus fa 1x w-6  -ml-2' />
                   <span className='ml-3'>Register</span>
                 </button>
+                <a
+                  href="/users/password/forget"
+                  className="no-underline hover:underline text-indigo-500 text-md text-right absolute right-0  mt-2"
+                >
+                  Forget Password?
+                </a>
               </div>
               <div className='my-12 border-b text-center'>
                 <div className='leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2'>
