@@ -3,7 +3,7 @@ import axios from "axios";
 import { Redirect } from "react-router-dom";
 import authSvg from "../assets/auth.svg";
 import { ToastContainer, toast } from "react-toastify";
-import { authenticate, isAuth } from "../helpers/auth";
+import { isAuth } from "../helpers/auth";
 
 const Register = () => {
   const [ formData, setFormData ] = useState({
@@ -11,13 +11,13 @@ const Register = () => {
     email : "",
     password1 : "",
     password2 : ""
-  })
+  });
 
   const { email, name, password1, password2 } = formData;
   //Handle Change from inputs
   const handleChange = text => e => {
     setFormData({...formData, [text] : e.target.value});
-  }
+  };
 
   //Submit data to backend
   const handleSubmit = e => {
@@ -46,7 +46,7 @@ const Register = () => {
     }else{
       toast.error("Please fill all fields");
     }
-  }
+  };
 
   return (
     <div className='min-h-screen bg-gray-100 text-gray-900 flex justify-center'>
