@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
-import authSvg from "../assets/login.svg";
 import { ToastContainer, toast } from "react-toastify";
+import { GoogleLogin } from "react-google-login";
 import { authenticate, isAuth } from "../helpers/auth";
+import authSvg from "../assets/login.svg";
 
 const Login = ({ history }) => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,34 @@ const Login = ({ history }) => {
   //Handle Change from inputs
   const handleChange = text => e => {
     setFormData({ ...formData, [text]: e.target.value });
+  };
+
+  //Send Google Token
+  const sendGoogleToken = tokenId => {
+    axios.post(`${process.env.REACT_APP_API_URL}/googlelogin`,{
+      idToken : tokenId
+    })
+    .then(res => {
+      informParent(res)
+    })
+    .catch(err => {
+      toast.error("Google login error");
+    });
+  };
+
+  //If success we need authenticate user and redirect
+  const informParent = response => {
+    authenticate(response, () => {
+      isAuth() && isAuth().role === 'admin'
+        ? history.push('/admin')
+        : history.push('/private');
+    });
+  };
+
+  //Get response from Google
+  const responseGoogle = response => {
+    console.log(response);
+    sendGoogleToken(response.tokenId);
   }
 
   //Submit data to backend
@@ -113,8 +142,26 @@ const Login = ({ history }) => {
                   target='_self'
                 >
                   <i className='fas fa-sign-in-alt fa 1x w-6  -ml-2 text-indigo-500' />
-                  <span className='ml-4'>Sign In</span>
+                  <span className='ml-4'>Sign Up</span>
                 </a>
+                <GoogleLogin
+                  clientId={`${process.env.REACT_APP_GOOGLE_CLIENT}`}
+                  onSuccess={responseGoogle}
+                  onFailure={responseGoogle}
+                  cookiePolicy={'single_host_origin'}
+                  render={renderProps => (
+                    <button
+                      onClick={renderProps.onClick}
+                      disabled={renderProps.disabled}
+                      className='w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline'
+                    >
+                      <div className=' p-2 rounded-full '>
+                        <i className='fab fa-google ' />
+                      </div>
+                      <span className='ml-4'>Sign In with Google</span>
+                    </button>
+                  )}
+                ></GoogleLogin>
               </div>
             </form>
           </div>
